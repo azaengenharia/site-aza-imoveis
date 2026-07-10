@@ -1,10 +1,72 @@
 const storedProperties = JSON.parse(localStorage.getItem("azaProperties") || "[]");
 const properties = [...(window.AZA_PROPERTIES || []), ...storedProperties];
+const whatsappButton = document.querySelector(".floating-whatsapp");
+let whatsappNotificationPlayed = false;
+let whatsappAudioContext = null;
 const currency = new Intl.NumberFormat("pt-BR", {
   style: "currency",
   currency: "BRL",
   maximumFractionDigits: 0,
 });
+
+function getWhatsappAudioContext() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return null;
+
+  if (!whatsappAudioContext || whatsappAudioContext.state === "closed") {
+    whatsappAudioContext = new AudioContext();
+  }
+
+  return whatsappAudioContext;
+}
+
+function playWhatsappNotification() {
+  if (whatsappNotificationPlayed) return;
+
+  const audioContext = getWhatsappAudioContext();
+  if (!audioContext || audioContext.state === "suspended") return;
+
+  whatsappNotificationPlayed = true;
+
+  const now = audioContext.currentTime;
+  const notes = [
+    { frequency: 880, start: 0, duration: .08 },
+    { frequency: 1175, start: .11, duration: .12 },
+  ];
+
+  notes.forEach((note) => {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(note.frequency, now + note.start);
+    gain.gain.setValueAtTime(0, now + note.start);
+    gain.gain.linearRampToValueAtTime(.055, now + note.start + .01);
+    gain.gain.exponentialRampToValueAtTime(.001, now + note.start + note.duration);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(now + note.start);
+    oscillator.stop(now + note.start + note.duration + .02);
+  });
+
+  window.setTimeout(() => audioContext.close(), 620);
+}
+
+function unlockWhatsappNotification() {
+  const audioContext = getWhatsappAudioContext();
+  if (!audioContext) return;
+
+  audioContext.resume().then(() => {
+    window.setTimeout(playWhatsappNotification, 3000);
+  }).catch(() => {});
+}
+
+if (whatsappButton) {
+  window.setTimeout(playWhatsappNotification, 3000);
+  window.addEventListener("pointerdown", unlockWhatsappNotification, { once: true });
+  window.addEventListener("keydown", unlockWhatsappNotification, { once: true });
+}
 
 function propertyCard(property, featured = false) {
   const meta = [
