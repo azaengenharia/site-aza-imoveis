@@ -1,15 +1,10 @@
-# Site AZA Imoveis
+# Site AZA Imóveis
 
-Prototipo estatico para GitHub Pages com visual preto/dourado, lista de imoveis, filtros e tela inicial de administracao.
+Site público estático para GitHub Pages com visual claro/dourado, lista de imóveis, filtros, destaques e contatos dos corretores.
 
 ## Arquivos principais
 
-- `index.html`: pagina publica.
-- `admin.html`: prototipo de cadastro local.
-- `data/properties.js`: imoveis iniciais.
-- `css/styles.css`: identidade visual.
-- `js/main.js`: filtros, renderizacao e prototipo de cadastro.
-
-## Observacao sobre admin
-
-O `admin.html` salva dados no `localStorage` do navegador apenas para validar o fluxo visual. Para uso real, conectar depois em Supabase, Decap CMS, Firebase ou GitHub API.
+- `index.html`: página pública.
+- `data/properties.js`: imóveis exibidos no site.
+- `css/styles.css`: identidade visual e responsivo.
+- `js/main.js`: filtros, carrossel, renderização pública e botão do WhatsApp.

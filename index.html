@@ -3,25 +3,32 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="AZA Imoveis: compra, venda e locacao de casas, lotes e oportunidades em Piumhi e regiao.">
-    <title>AZA Imoveis</title>
+    <meta name="description" content="AZA Imóveis: compra, venda e locação de casas, lotes e oportunidades em Piumhi e região.">
+    <title>AZA Imóveis</title>
     <link rel="icon" href="assets/logos/favicon.ico" sizes="any">
     <link rel="stylesheet" href="css/styles.css">
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#inicio" aria-label="AZA Imoveis">
-        <img src="assets/logos/aza-logo.png" alt="">
-        <span>AZA Imoveis</span>
+      <a class="brand" href="#inicio" aria-label="AZA Imóveis">
+        <img src="assets/logos/aza-imoveis-logo.png" alt="AZA Imóveis">
       </a>
       <nav class="nav" aria-label="Navegacao principal">
-        <a href="#imoveis">Imoveis</a>
+        <a href="#imoveis">Imóveis</a>
         <a href="#corretores">Corretores</a>
         <a href="#contato">Contato</a>
         <a class="nav-bridge" href="https://azaengenharia.com.br">Engenharia</a>
-        <a href="admin.html">Admin</a>
       </nav>
-      <a class="header-phone" href="https://wa.me/5537999940536" target="_blank" rel="noopener">(37) 9 9994-0536</a>
+      <div class="header-contacts" aria-label="Contato">
+        <a class="header-contact header-email" href="mailto:julianoaza@hotmail.com">
+          <span>E-mail</span>
+          <strong>julianoaza@hotmail.com</strong>
+        </a>
+        <a class="header-contact header-phone" href="https://wa.me/5537999940536" target="_blank" rel="noopener">
+          <span>Telefone</span>
+          <strong>(37) 9 9994-0536</strong>
+        </a>
+      </div>
     </header>
 
     <main id="inicio">
@@ -30,10 +37,9 @@
           <img src="assets/images/hero-residencia.jpg" alt="">
         </div>
         <div class="hero-content">
-          <p class="eyebrow">AZA Imoveis</p>
-          <h1>Imoveis selecionados com atendimento direto e visao tecnica.</h1>
+          <h1>Imóveis selecionados com atendimento próximo, cuidado e agilidade.</h1>
           <p>
-            Casas, lotes e oportunidades para compra ou locacao em Piumhi e regiao, com suporte de corretores credenciados e a experiencia da AZA em obras e regularizacao.
+            Casas, lotes e oportunidades para compra ou locação em Piumhi e região, com resposta atenciosa, orientação clara e a experiência da AZA em obras e regularização.
           </p>
           <form class="search-panel" id="hero-search">
             <label>
@@ -41,7 +47,7 @@
               <select name="purpose">
                 <option value="">Comprar ou alugar</option>
                 <option>Venda</option>
-                <option>Locacao</option>
+                <option>Locação</option>
               </select>
             </label>
             <label>
@@ -56,7 +62,7 @@
                 <option value="">Todos os tipos</option>
               </select>
             </label>
-            <button type="submit">Buscar imovel</button>
+            <button type="submit">Buscar imóvel</button>
           </form>
         </div>
       </section>
@@ -67,28 +73,35 @@
           <span>Corretores credenciados</span>
         </div>
         <div>
-          <strong>Piumhi e regiao</strong>
-          <span>Venda, locacao e oportunidades</span>
+          <strong>Piumhi e região</strong>
+          <span>Venda, locação e oportunidades</span>
         </div>
         <div>
           <strong>AZA Engenharia</strong>
-          <span>Apoio tecnico em obras e regularizacao</span>
+          <span>Apoio tecnico em obras e regularização</span>
         </div>
       </section>
 
       <section class="section" id="imoveis">
         <div class="section-heading">
-          <p class="eyebrow">Portfolio</p>
-          <h2>Imoveis em destaque</h2>
-          <a href="#lista">Ver todos</a>
+          <h2>Imóveis em destaque</h2>
         </div>
 
-        <div class="feature-grid" id="featured-list"></div>
+        <div class="featured-carousel" id="featured-carousel" aria-label="Imóveis em destaque">
+          <button class="carousel-arrow carousel-prev" type="button" data-featured-prev aria-label="Imóvel anterior">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <div class="feature-viewport">
+            <div class="feature-grid" id="featured-list"></div>
+          </div>
+          <button class="carousel-arrow carousel-next" type="button" data-featured-next aria-label="Próximo imóvel">
+            <span aria-hidden="true">›</span>
+          </button>
+        </div>
 
         <div class="filter-card" id="lista">
           <div class="filter-header">
             <div>
-              <p class="eyebrow">Busca</p>
               <h2>Encontre por perfil</h2>
             </div>
             <span id="result-count"></span>
@@ -99,7 +112,7 @@
               <select name="purpose">
                 <option value="">Todas</option>
                 <option>Venda</option>
-                <option>Locacao</option>
+                <option>Locação</option>
               </select>
             </label>
             <label>
@@ -133,9 +146,8 @@
 
       <section class="brokers" id="corretores">
         <div>
-          <p class="eyebrow">Atendimento</p>
-          <h2>Negociacao com proximidade, criterio e documentacao em ordem.</h2>
-          <p>O atendimento une experiencia imobiliaria, leitura tecnica do imovel e orientacao clara para compra, venda, locacao e regularizacao.</p>
+          <h2>Negociação próxima, criteriosa e com documentação em ordem.</h2>
+          <p>O atendimento combina atenção no retorno, agilidade nas informações e orientação clara para compra, venda, locação e regularização.</p>
         </div>
         <div class="broker-grid">
           <article>
@@ -153,14 +165,13 @@
 
       <section class="cta" id="contato">
         <div>
-          <p class="eyebrow">Contato</p>
           <h2>Quer anunciar, comprar ou alugar?</h2>
-          <p>Fale com a AZA Imoveis e envie as informacoes do imovel ou do perfil que voce procura.</p>
+          <p>Fale com a AZA Imóveis e envie as informações do imóvel ou do perfil que você procura. O retorno é próximo, objetivo e cuidadoso.</p>
         </div>
         <div class="cta-actions">
           <a class="btn-primary" href="https://wa.me/5537999940536" target="_blank" rel="noopener">Chamar Juliano</a>
-          <a class="btn-secondary" href="mailto:julianoaza@hotmail.com">julianoaza@hotmail.com</a>
-          <span>Rua Belizario Guimaraes, 201 - Nova Piumhi - Piumhi/MG</span>
+          <a class="btn-secondary" href="https://wa.me/5537999295958" target="_blank" rel="noopener">Chamar Luis Claudio</a>
+          <span>Rua Belizário Guimarães, 201 - Nova Piumhi - Piumhi/MG</span>
         </div>
       </section>
     </main>

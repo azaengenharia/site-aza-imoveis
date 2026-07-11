@@ -1,5 +1,4 @@
-const storedProperties = JSON.parse(localStorage.getItem("azaProperties") || "[]");
-const properties = [...(window.AZA_PROPERTIES || []), ...storedProperties];
+const properties = window.AZA_PROPERTIES || [];
 const whatsappButton = document.querySelector(".floating-whatsapp");
 let whatsappNotificationPlayed = false;
 let whatsappAudioContext = null;
@@ -141,6 +140,7 @@ function applyFilters(items, filters) {
 }
 
 function renderPublicPage() {
+  const featuredCarousel = document.querySelector("#featured-carousel");
   const featuredList = document.querySelector("#featured-list");
   const propertyList = document.querySelector("#property-list");
   const filters = document.querySelector("#filters");
@@ -150,15 +150,16 @@ function renderPublicPage() {
 
   fillSelects();
 
-  const featured = properties.filter((property) => property.featured).slice(0, 2);
+  const featured = properties.filter((property) => property.featured);
   featuredList.innerHTML = featured.map((property) => propertyCard(property, true)).join("");
+  setupFeaturedCarousel(featuredCarousel, featuredList, featured.length);
 
   function renderList() {
     const filtered = applyFilters(properties, getFilters(filters));
-    resultCount.textContent = `${filtered.length} imoveis encontrados`;
+    resultCount.textContent = `${filtered.length} imóveis encontrados`;
     propertyList.innerHTML = filtered.length
       ? filtered.map((property) => propertyCard(property)).join("")
-      : '<div class="empty-state">Nenhum imovel encontrado com esses filtros.</div>';
+      : '<div class="empty-state">Nenhum imóvel encontrado com esses filtros.</div>';
   }
 
   filters.addEventListener("input", renderList);
@@ -176,62 +177,55 @@ function renderPublicPage() {
   renderList();
 }
 
-function adminPropertyFromForm(form) {
-  const data = new FormData(form);
-  return {
-    id: data.get("id"),
-    title: data.get("title"),
-    purpose: data.get("purpose"),
-    type: data.get("type"),
-    city: data.get("city"),
-    neighborhood: data.get("neighborhood"),
-    price: Number(data.get("price") || 0),
-    area: Number(data.get("area") || 0),
-    bedrooms: Number(data.get("bedrooms") || 0),
-    suites: Number(data.get("suites") || 0),
-    bathrooms: Number(data.get("bathrooms") || 0),
-    parking: Number(data.get("parking") || 0),
-    image: data.get("image"),
-    description: data.get("description"),
-    featured: data.get("featured") === "on",
-  };
-}
+function setupFeaturedCarousel(carousel, track, total) {
+  if (!carousel || !track) return;
 
-function renderAdminPage() {
-  const form = document.querySelector("#property-form");
-  const preview = document.querySelector("#admin-preview-card");
-  const clearButton = document.querySelector("#clear-local");
-  if (!form || !preview) return;
+  const previousButton = carousel.querySelector("[data-featured-prev]");
+  const nextButton = carousel.querySelector("[data-featured-next]");
+  let current = 0;
+  let timer = null;
 
-  function updatePreview() {
-    preview.innerHTML = propertyCard(adminPropertyFromForm(form));
+  carousel.classList.toggle("is-single", total <= 1);
+
+  function update() {
+    track.style.transform = `translateX(-${current * 100}%)`;
   }
 
-  form.addEventListener("input", updatePreview);
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const property = adminPropertyFromForm(form);
-    const saved = JSON.parse(localStorage.getItem("azaProperties") || "[]");
-    const next = saved.filter((item) => item.id !== property.id);
-    next.push(property);
-    localStorage.setItem("azaProperties", JSON.stringify(next));
-    alert("Imovel salvo no prototipo local.");
+  function goTo(nextIndex) {
+    if (total <= 1) return;
+    current = (nextIndex + total) % total;
+    update();
+  }
+
+  function start() {
+    if (total <= 1) return;
+    stop();
+    timer = window.setInterval(() => goTo(current + 1), 5200);
+  }
+
+  function stop() {
+    if (!timer) return;
+    window.clearInterval(timer);
+    timer = null;
+  }
+
+  previousButton?.addEventListener("click", () => {
+    goTo(current - 1);
+    start();
   });
 
-  clearButton.addEventListener("click", () => {
-    localStorage.removeItem("azaProperties");
-    alert("Imoveis locais removidos.");
+  nextButton?.addEventListener("click", () => {
+    goTo(current + 1);
+    start();
   });
 
-  form.elements.id.value = `AZA-${Math.floor(Math.random() * 800 + 100)}`;
-  form.elements.title.value = "Casa com acabamento premium";
-  form.elements.city.value = "Piumhi";
-  form.elements.neighborhood.value = "Centro";
-  form.elements.price.value = "650000";
-  form.elements.area.value = "180";
-  form.elements.description.value = "Imovel com excelente apresentacao, ambientes bem distribuidos e documentacao pronta para negociacao.";
-  updatePreview();
+  carousel.addEventListener("mouseenter", stop);
+  carousel.addEventListener("mouseleave", start);
+  carousel.addEventListener("focusin", stop);
+  carousel.addEventListener("focusout", start);
+
+  update();
+  start();
 }
 
 renderPublicPage();
-renderAdminPage();
