@@ -1,7 +1,8 @@
-const properties = window.AZA_PROPERTIES || [];
+let properties = [];
 const whatsappButton = document.querySelector(".floating-whatsapp");
 let whatsappNotificationPlayed = false;
 let whatsappAudioContext = null;
+let publicPageEventsBound = false;
 const currency = new Intl.NumberFormat("pt-BR", {
   style: "currency",
   currency: "BRL",
@@ -77,7 +78,7 @@ function propertyCard(property, featured = false) {
 
   return `
     <article class="property-card${featured ? " featured" : ""}">
-      <img src="${property.image}" alt="">
+      <img src="${property.image}" alt="${property.imageAlt || ""}">
       <div class="property-body">
         <div>
           <span class="property-code">${property.id}</span>
@@ -139,6 +140,34 @@ function applyFilters(items, filters) {
   });
 }
 
+function setLoadingState() {
+  const featuredList = document.querySelector("#featured-list");
+  const propertyList = document.querySelector("#property-list");
+  const resultCount = document.querySelector("#result-count");
+
+  if (featuredList) featuredList.innerHTML = '<div class="empty-state">Carregando imóveis em destaque...</div>';
+  if (propertyList) propertyList.innerHTML = '<div class="empty-state">Carregando imóveis cadastrados...</div>';
+  if (resultCount) resultCount.textContent = "";
+}
+
+function setErrorState(message) {
+  const featuredList = document.querySelector("#featured-list");
+  const propertyList = document.querySelector("#property-list");
+  const details = message ? `<small>${message}</small>` : "";
+  const html = `<div class="empty-state">Não foi possível carregar os imóveis agora. ${details}</div>`;
+
+  if (featuredList) featuredList.innerHTML = html;
+  if (propertyList) propertyList.innerHTML = html;
+}
+
+function clearDynamicOptions() {
+  document.querySelectorAll('select[name="city"], select[name="type"]').forEach((select) => {
+    const firstOption = select.options[0]?.cloneNode(true);
+    select.innerHTML = "";
+    if (firstOption) select.add(firstOption);
+  });
+}
+
 function renderPublicPage() {
   const featuredCarousel = document.querySelector("#featured-carousel");
   const featuredList = document.querySelector("#featured-list");
@@ -148,10 +177,13 @@ function renderPublicPage() {
   const resultCount = document.querySelector("#result-count");
   if (!featuredList || !propertyList || !filters) return;
 
+  clearDynamicOptions();
   fillSelects();
 
   const featured = properties.filter((property) => property.featured);
-  featuredList.innerHTML = featured.map((property) => propertyCard(property, true)).join("");
+  featuredList.innerHTML = featured.length
+    ? featured.map((property) => propertyCard(property, true)).join("")
+    : '<div class="empty-state">Nenhum imóvel em destaque no momento.</div>';
   setupFeaturedCarousel(featuredCarousel, featuredList, featured.length);
 
   function renderList() {
@@ -162,17 +194,20 @@ function renderPublicPage() {
       : '<div class="empty-state">Nenhum imóvel encontrado com esses filtros.</div>';
   }
 
-  filters.addEventListener("input", renderList);
-  filters.addEventListener("reset", () => window.setTimeout(renderList, 0));
-  heroSearch.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(heroSearch);
-    filters.elements.purpose.value = data.get("purpose");
-    filters.elements.city.value = data.get("city");
-    filters.elements.type.value = data.get("type");
-    document.querySelector("#lista").scrollIntoView({ behavior: "smooth" });
-    renderList();
-  });
+  if (!publicPageEventsBound) {
+    filters.addEventListener("input", renderList);
+    filters.addEventListener("reset", () => window.setTimeout(renderList, 0));
+    heroSearch.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(heroSearch);
+      filters.elements.purpose.value = data.get("purpose");
+      filters.elements.city.value = data.get("city");
+      filters.elements.type.value = data.get("type");
+      document.querySelector("#lista").scrollIntoView({ behavior: "smooth" });
+      renderList();
+    });
+    publicPageEventsBound = true;
+  }
 
   renderList();
 }
@@ -180,10 +215,26 @@ function renderPublicPage() {
 function setupFeaturedCarousel(carousel, track, total) {
   if (!carousel || !track) return;
 
-  const previousButton = carousel.querySelector("[data-featured-prev]");
-  const nextButton = carousel.querySelector("[data-featured-next]");
+  let previousButton = carousel.querySelector("[data-featured-prev]");
+  let nextButton = carousel.querySelector("[data-featured-next]");
   let current = 0;
-  let timer = null;
+
+  if (carousel._azaFeaturedTimer) {
+    window.clearInterval(carousel._azaFeaturedTimer);
+    carousel._azaFeaturedTimer = null;
+  }
+
+  if (previousButton) {
+    const cleanButton = previousButton.cloneNode(true);
+    previousButton.replaceWith(cleanButton);
+    previousButton = cleanButton;
+  }
+
+  if (nextButton) {
+    const cleanButton = nextButton.cloneNode(true);
+    nextButton.replaceWith(cleanButton);
+    nextButton = cleanButton;
+  }
 
   carousel.classList.toggle("is-single", total <= 1);
 
@@ -200,13 +251,13 @@ function setupFeaturedCarousel(carousel, track, total) {
   function start() {
     if (total <= 1) return;
     stop();
-    timer = window.setInterval(() => goTo(current + 1), 5200);
+    carousel._azaFeaturedTimer = window.setInterval(() => goTo(current + 1), 5200);
   }
 
   function stop() {
-    if (!timer) return;
-    window.clearInterval(timer);
-    timer = null;
+    if (!carousel._azaFeaturedTimer) return;
+    window.clearInterval(carousel._azaFeaturedTimer);
+    carousel._azaFeaturedTimer = null;
   }
 
   previousButton?.addEventListener("click", () => {
@@ -219,13 +270,24 @@ function setupFeaturedCarousel(carousel, track, total) {
     start();
   });
 
-  carousel.addEventListener("mouseenter", stop);
-  carousel.addEventListener("mouseleave", start);
-  carousel.addEventListener("focusin", stop);
-  carousel.addEventListener("focusout", start);
-
   update();
   start();
 }
 
-renderPublicPage();
+async function initPublicPage(options = {}) {
+  if (!options.silent) setLoadingState();
+
+  try {
+    properties = await window.AZA_DATA.loadPublishedProperties();
+    renderPublicPage();
+  } catch (error) {
+    setErrorState(error.message);
+  }
+}
+
+initPublicPage();
+window.setInterval(() => initPublicPage({ silent: true }), 45000);
+window.addEventListener("focus", () => initPublicPage({ silent: true }));
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) initPublicPage({ silent: true });
+});
