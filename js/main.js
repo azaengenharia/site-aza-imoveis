@@ -1,8 +1,16 @@
 let properties = [];
 const whatsappButton = document.querySelector(".floating-whatsapp");
+const propertyMediaModal = document.querySelector("#property-media-modal");
+const propertyMediaTitle = document.querySelector("#property-media-title");
+const propertyMediaImage = document.querySelector("#property-media-image");
+const propertyMediaVideo = document.querySelector("#property-media-video");
+const propertyMediaCaption = document.querySelector("#property-media-caption");
+const propertyMediaThumbs = document.querySelector("#property-media-thumbs");
 let whatsappNotificationPlayed = false;
 let whatsappAudioContext = null;
 let publicPageEventsBound = false;
+let activePropertyMedia = [];
+let activePropertyMediaIndex = 0;
 const currency = new Intl.NumberFormat("pt-BR", {
   style: "currency",
   currency: "BRL",
@@ -78,7 +86,10 @@ function propertyCard(property, featured = false) {
 
   return `
     <article class="property-card${featured ? " featured" : ""}">
-      <img src="${property.image}" alt="${property.imageAlt || ""}">
+      <div class="property-card-media">
+        <img src="${property.image}" alt="${property.imageAlt || ""}">
+        ${property.images.length ? `<button class="property-media-button" type="button" data-property-media="${property.uuid}">Ver fotos e vídeos <span>${property.images.length}</span></button>` : ""}
+      </div>
       <div class="property-body">
         <div>
           <span class="property-code">${property.id}</span>
@@ -94,6 +105,96 @@ function propertyCard(property, featured = false) {
       </div>
     </article>
   `;
+}
+
+function renderPropertyMedia(index) {
+  if (!activePropertyMedia.length) return;
+
+  activePropertyMediaIndex = (index + activePropertyMedia.length) % activePropertyMedia.length;
+  const media = activePropertyMedia[activePropertyMediaIndex];
+  propertyMediaVideo.pause();
+
+  if (media.type === "video") {
+    propertyMediaImage.classList.add("is-hidden");
+    propertyMediaImage.removeAttribute("src");
+    propertyMediaVideo.classList.remove("is-hidden");
+    propertyMediaVideo.src = media.src;
+    propertyMediaVideo.setAttribute("aria-label", media.alt || "Vídeo do imóvel");
+  } else {
+    propertyMediaVideo.classList.add("is-hidden");
+    propertyMediaVideo.removeAttribute("src");
+    propertyMediaVideo.load();
+    propertyMediaImage.classList.remove("is-hidden");
+    propertyMediaImage.src = media.src;
+    propertyMediaImage.alt = media.alt || "";
+  }
+
+  propertyMediaCaption.textContent = media.caption || "";
+  propertyMediaThumbs.querySelectorAll(".property-media-thumb").forEach((button, buttonIndex) => {
+    button.classList.toggle("is-active", buttonIndex === activePropertyMediaIndex);
+  });
+}
+
+function openPropertyMedia(propertyId) {
+  const property = properties.find((item) => item.uuid === propertyId);
+  if (!property?.images.length || !propertyMediaModal) return;
+
+  activePropertyMedia = property.images;
+  activePropertyMediaIndex = 0;
+  propertyMediaTitle.textContent = property.title;
+  propertyMediaThumbs.innerHTML = "";
+
+  activePropertyMedia.forEach((media, index) => {
+    const button = document.createElement("button");
+    button.className = "property-media-thumb";
+    button.type = "button";
+    button.setAttribute("aria-label", `Abrir ${media.type === "video" ? "vídeo" : "foto"} ${index + 1}`);
+    button.innerHTML = media.type === "video"
+      ? '<span class="property-video-thumb" aria-hidden="true">▶</span>'
+      : `<img src="${media.src}" alt="">`;
+    button.addEventListener("click", () => renderPropertyMedia(index));
+    propertyMediaThumbs.appendChild(button);
+  });
+
+  propertyMediaModal.classList.add("is-open");
+  propertyMediaModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  renderPropertyMedia(0);
+  propertyMediaModal.querySelector(".property-media-close").focus();
+}
+
+function closePropertyMedia() {
+  if (!propertyMediaModal) return;
+  propertyMediaModal.classList.remove("is-open");
+  propertyMediaModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  propertyMediaImage.removeAttribute("src");
+  propertyMediaVideo.pause();
+  propertyMediaVideo.removeAttribute("src");
+  propertyMediaVideo.load();
+  activePropertyMedia = [];
+}
+
+if (propertyMediaModal) {
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-property-media]");
+    if (trigger) openPropertyMedia(trigger.dataset.propertyMedia);
+  });
+  propertyMediaModal.querySelectorAll("[data-property-media-close]").forEach((button) => {
+    button.addEventListener("click", closePropertyMedia);
+  });
+  propertyMediaModal.querySelector("[data-property-media-prev]").addEventListener("click", () => {
+    renderPropertyMedia(activePropertyMediaIndex - 1);
+  });
+  propertyMediaModal.querySelector("[data-property-media-next]").addEventListener("click", () => {
+    renderPropertyMedia(activePropertyMediaIndex + 1);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (!propertyMediaModal.classList.contains("is-open")) return;
+    if (event.key === "Escape") closePropertyMedia();
+    if (event.key === "ArrowLeft") renderPropertyMedia(activePropertyMediaIndex - 1);
+    if (event.key === "ArrowRight") renderPropertyMedia(activePropertyMediaIndex + 1);
+  });
 }
 
 function uniqueValues(key) {
