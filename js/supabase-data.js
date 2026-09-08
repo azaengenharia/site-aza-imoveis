@@ -69,7 +69,7 @@ function normalizeProperty(record, imagesByProperty) {
       type: mediaType(image),
       src: mediaUrl(image.image_url),
       alt: image.alt_text || record.title || "",
-      caption: image.alt_text || record.description || record.title || "",
+      caption: image.alt_text || record.title || "",
     })),
     description: record.description || "",
     createdAt: record.created_at || "",

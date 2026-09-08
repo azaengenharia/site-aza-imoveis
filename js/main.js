@@ -6,6 +6,15 @@ const propertyMediaImage = document.querySelector("#property-media-image");
 const propertyMediaVideo = document.querySelector("#property-media-video");
 const propertyMediaCaption = document.querySelector("#property-media-caption");
 const propertyMediaThumbs = document.querySelector("#property-media-thumbs");
+const propertyMediaCode = document.querySelector("#property-media-code");
+const propertyMediaPurpose = document.querySelector("#property-media-purpose");
+const propertyMediaLocation = document.querySelector("#property-media-location");
+const propertyMediaPrice = document.querySelector("#property-media-price");
+const propertyMediaFacts = document.querySelector("#property-media-facts");
+const propertyMediaDescription = document.querySelector("#property-media-description");
+const propertyMediaCounter = document.querySelector("#property-media-counter");
+const propertyWhatsappJuliano = document.querySelector("#property-whatsapp-juliano");
+const propertyWhatsappLuis = document.querySelector("#property-whatsapp-luis");
 let whatsappNotificationPlayed = false;
 let whatsappAudioContext = null;
 let publicPageEventsBound = false;
@@ -17,6 +26,7 @@ const currency = new Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
 
 function getWhatsappAudioContext() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -88,8 +98,10 @@ function propertyCard(property, featured = false) {
   return `
     <article class="property-card${featured ? " featured" : ""}">
       <div class="property-card-media">
-        <img src="${property.image}" alt="${property.imageAlt || ""}">
-        ${property.images.length ? `<button class="property-media-button" type="button" data-property-media="${property.uuid}">Ver fotos e vídeos <span>${property.images.length}</span></button>` : ""}
+        <button class="property-cover-button" type="button" data-property-media="${property.uuid}" aria-label="Ver detalhes e fotos de ${property.title}">
+          <img src="${property.image}" alt="${property.imageAlt || ""}">
+        </button>
+        <button class="property-media-button" type="button" data-property-media="${property.uuid}">Ver imóvel <span>${Math.max(property.images.length, 1)}</span></button>
       </div>
       <div class="property-body">
         <div>
@@ -131,6 +143,7 @@ function renderPropertyMedia(index) {
   }
 
   propertyMediaCaption.textContent = media.caption || "";
+  propertyMediaCounter.textContent = `${activePropertyMediaIndex + 1} de ${activePropertyMedia.length}`;
   propertyMediaThumbs.querySelectorAll(".property-media-thumb").forEach((button, buttonIndex) => {
     button.classList.toggle("is-active", buttonIndex === activePropertyMediaIndex);
   });
@@ -138,11 +151,35 @@ function renderPropertyMedia(index) {
 
 function openPropertyMedia(propertyId) {
   const property = properties.find((item) => item.uuid === propertyId);
-  if (!property?.images.length || !propertyMediaModal) return;
+  if (!property || !propertyMediaModal) return;
 
-  activePropertyMedia = property.images;
+  activePropertyMedia = property.images.length ? property.images : [{
+    type: "image",
+    src: property.image,
+    alt: property.imageAlt || property.title,
+    caption: property.title,
+  }];
   activePropertyMediaIndex = 0;
   propertyMediaTitle.textContent = property.title;
+  propertyMediaCode.textContent = property.id || "AZA";
+  propertyMediaPurpose.textContent = property.purpose || "Imóvel";
+  propertyMediaLocation.textContent = [property.neighborhood, property.city ? `${property.city}/MG` : ""].filter(Boolean).join(" · ");
+  propertyMediaPrice.textContent = Number(property.price) > 0 ? currency.format(Number(property.price)) : "Consulte";
+  propertyMediaDescription.textContent = property.description || "Entre em contato com a AZA para conhecer todos os detalhes deste imóvel.";
+
+  const facts = [
+    ["Tipo", property.type],
+    ["Área", Number(property.area) > 0 ? `${number.format(Number(property.area))} m²` : ""],
+    ["Quartos", Number(property.bedrooms) > 0 ? property.bedrooms : ""],
+    ["Suítes", Number(property.suites) > 0 ? property.suites : ""],
+    ["Banheiros", Number(property.bathrooms) > 0 ? property.bathrooms : ""],
+    ["Vagas", Number(property.parking) > 0 ? property.parking : ""],
+  ].filter(([, value]) => value !== "" && value != null);
+  propertyMediaFacts.innerHTML = facts.map(([label, value]) => `<span><small>${label}</small><strong>${value}</strong></span>`).join("");
+
+  const message = encodeURIComponent(`Olá! Tenho interesse no imóvel ${property.id || ""} — ${property.title}. Gostaria de mais informações.`);
+  propertyWhatsappJuliano.href = `https://wa.me/5537999940536?text=${message}`;
+  propertyWhatsappLuis.href = `https://wa.me/5537999295958?text=${message}`;
   propertyMediaThumbs.innerHTML = "";
 
   activePropertyMedia.forEach((media, index) => {
@@ -158,6 +195,7 @@ function openPropertyMedia(propertyId) {
   });
 
   propertyMediaModal.classList.add("is-open");
+  propertyMediaModal.classList.toggle("has-single-media", activePropertyMedia.length === 1);
   propertyMediaModal.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
   renderPropertyMedia(0);
@@ -167,6 +205,7 @@ function openPropertyMedia(propertyId) {
 function closePropertyMedia() {
   if (!propertyMediaModal) return;
   propertyMediaModal.classList.remove("is-open");
+  propertyMediaModal.classList.remove("has-single-media");
   propertyMediaModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
   propertyMediaImage.removeAttribute("src");

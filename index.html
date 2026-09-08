@@ -197,20 +197,54 @@
       <div class="property-media-backdrop" data-property-media-close></div>
       <section class="property-media-dialog" role="dialog" aria-modal="true" aria-labelledby="property-media-title">
         <header class="property-media-header">
-          <div>
-            <span>Galeria do imóvel</span>
-            <h2 id="property-media-title">Fotos e vídeos</h2>
+          <div class="property-media-heading">
+            <div class="property-media-badges">
+              <span id="property-media-code">AZA</span>
+              <span id="property-media-purpose">Imóvel</span>
+            </div>
+            <h2 id="property-media-title">Detalhes do imóvel</h2>
+            <p id="property-media-location"></p>
           </div>
-          <button class="property-media-close" type="button" data-property-media-close aria-label="Fechar galeria">×</button>
+          <button class="property-media-close" type="button" data-property-media-close aria-label="Fechar detalhes do imóvel">×</button>
         </header>
-        <div class="property-media-stage">
-          <button class="property-media-nav property-media-prev" type="button" data-property-media-prev aria-label="Mídia anterior">‹</button>
-          <img id="property-media-image" src="" alt="">
-          <video class="is-hidden" id="property-media-video" controls playsinline preload="metadata"></video>
-          <button class="property-media-nav property-media-next" type="button" data-property-media-next aria-label="Próxima mídia">›</button>
+
+        <div class="property-detail-layout">
+          <aside class="property-detail-summary">
+            <div class="property-detail-price">
+              <span>Valor do imóvel</span>
+              <strong id="property-media-price">R$ 0,00</strong>
+            </div>
+            <div class="property-detail-facts" id="property-media-facts"></div>
+            <div class="property-detail-contact">
+              <span>Gostou deste imóvel?</span>
+              <strong>Converse com a AZA</strong>
+              <a id="property-whatsapp-juliano" href="https://wa.me/5537999940536" target="_blank" rel="noopener">Falar com Juliano</a>
+              <a id="property-whatsapp-luis" href="https://wa.me/5537999295958" target="_blank" rel="noopener">Falar com Luis Claudio</a>
+            </div>
+          </aside>
+
+          <div class="property-detail-gallery">
+            <div class="property-media-stage">
+              <button class="property-media-nav property-media-prev" type="button" data-property-media-prev aria-label="Mídia anterior">‹</button>
+              <img id="property-media-image" src="" alt="">
+              <video class="is-hidden" id="property-media-video" controls playsinline preload="metadata"></video>
+              <button class="property-media-nav property-media-next" type="button" data-property-media-next aria-label="Próxima mídia">›</button>
+            </div>
+            <div class="property-media-status">
+              <p class="property-media-caption" id="property-media-caption"></p>
+              <span id="property-media-counter"></span>
+            </div>
+            <div class="property-media-thumbs" id="property-media-thumbs" aria-label="Itens da galeria"></div>
+          </div>
         </div>
-        <p class="property-media-caption" id="property-media-caption"></p>
-        <div class="property-media-thumbs" id="property-media-thumbs" aria-label="Itens da galeria"></div>
+
+        <section class="property-detail-description">
+          <div>
+            <span>Sobre o imóvel</span>
+            <h3>Um olhar completo antes da visita</h3>
+          </div>
+          <p id="property-media-description"></p>
+        </section>
       </section>
     </div>
 
