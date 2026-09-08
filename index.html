@@ -205,7 +205,9 @@
             <h2 id="property-media-title">Detalhes do imóvel</h2>
             <p id="property-media-location"></p>
           </div>
-          <button class="property-media-close" type="button" data-property-media-close aria-label="Fechar detalhes do imóvel">×</button>
+          <button class="property-media-close" type="button" data-property-media-close aria-label="Fechar detalhes do imóvel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.05 5.64 12 10.59l4.95-4.95 1.41 1.41L13.41 12l4.95 4.95-1.41 1.41L12 13.41l-4.95 4.95-1.41-1.41L10.59 12 5.64 7.05z"></path></svg>
+          </button>
         </header>
 
         <div class="property-detail-layout">
@@ -225,10 +227,14 @@
 
           <div class="property-detail-gallery">
             <div class="property-media-stage">
-              <button class="property-media-nav property-media-prev" type="button" data-property-media-prev aria-label="Mídia anterior">‹</button>
+              <button class="property-media-nav property-media-prev" type="button" data-property-media-prev aria-label="Mídia anterior">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 10.83 12l4.58 4.59L14 18l-6-6 6-6z"></path></svg>
+              </button>
               <img id="property-media-image" src="" alt="">
               <video class="is-hidden" id="property-media-video" controls playsinline preload="metadata"></video>
-              <button class="property-media-nav property-media-next" type="button" data-property-media-next aria-label="Próxima mídia">›</button>
+              <button class="property-media-nav property-media-next" type="button" data-property-media-next aria-label="Próxima mídia">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"></path></svg>
+              </button>
             </div>
             <div class="property-media-status">
               <p class="property-media-caption" id="property-media-caption"></p>

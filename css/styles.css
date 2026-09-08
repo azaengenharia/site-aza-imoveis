@@ -807,24 +807,41 @@ textarea {
 }
 
 .property-media-close {
-  display: grid;
+  display: flex;
   width: 44px;
   height: 44px;
-  place-items: center;
   flex: 0 0 auto;
-  border: 1px solid rgba(32, 27, 20, .15);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  color: #24211c;
-  background: rgba(255, 255, 255, .68);
+  color: #fff;
+  background: #17130e;
+  box-shadow: 0 7px 18px rgba(23, 19, 14, .2);
   cursor: pointer;
-  font-size: 2rem;
-  line-height: 1;
+  transition: color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.property-media-close svg,
+.property-media-nav svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
 }
 
 .property-media-close:hover {
-  color: #fff;
-  border-color: #16130f;
-  background: #16130f;
+  color: #17130e;
+  background: var(--gold-light);
+  box-shadow: 0 9px 22px rgba(139, 93, 24, .25);
+  transform: translateY(-1px);
+}
+
+.property-media-close:focus-visible,
+.property-media-nav:focus-visible {
+  outline: 3px solid rgba(217, 164, 65, .45);
+  outline-offset: 3px;
 }
 
 .property-detail-layout {
@@ -983,18 +1000,31 @@ textarea {
   position: absolute;
   top: 50%;
   z-index: 2;
-  display: grid;
+  display: flex;
   width: 46px;
   height: 46px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, .18);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  color: #fff;
-  background: rgba(12, 12, 12, .72);
+  color: #1b150c;
+  background: var(--gold-light);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .32);
   cursor: pointer;
-  font-size: 2.3rem;
-  line-height: 1;
   transform: translateY(-50%);
+  transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.property-media-nav svg {
+  width: 20px;
+  height: 20px;
+}
+
+.property-media-nav:hover {
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .42);
+  transform: translateY(-50%) scale(1.05);
 }
 
 .property-media-prev {
